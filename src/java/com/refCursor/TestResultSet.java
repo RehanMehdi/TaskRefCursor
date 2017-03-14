@@ -1,6 +1,4 @@
 
-package com.refCursor;
-        
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,20 +25,18 @@ public class TestResultSet {
     private static final String DB_CONNECTION = "jdbc:oracle:thin:@localhost:1521:xe";
     private static final String DB_USER = "mehdi";
     private static final String DB_PASSWORD = "123";
-    Connection dbConnection = null;
 
-    public TestResultSet() {
-        getDBConnection();
-//        try {
-//            callOracleStoredProcCURSORParameter();
-//        } catch (SQLException e) {
-//            System.out.println(e.getMessage());
-//        }
+    public static void main(String[] argv) {
+
+        try {
+            callOracleStoredProcCURSORParameter();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    public String callOracleStoredProcCURSORParameter()
+    private static void callOracleStoredProcCURSORParameter()
             throws SQLException {
-        String toReturn = "";
 
         Connection dbConnection = null;
         CallableStatement callableStatement = null;
@@ -49,7 +45,7 @@ public class TestResultSet {
         String getDBUSERCursorSql = "{call GET_TICKETS(?,?,?)}";
 
         try {
-//            dbConnection = getDBConnection();
+            dbConnection = getDBConnection();
             callableStatement = dbConnection.prepareCall(getDBUSERCursorSql);
 
             callableStatement.setInt("P_scid", 5);
@@ -57,7 +53,7 @@ public class TestResultSet {
             callableStatement.registerOutParameter("p_readytime", OracleTypes.CURSOR);
 
             // execute getDBUSERCursor store procedure
-            callableStatement.execute();
+            callableStatement.executeUpdate();
 
             // get cursor and cast it to ResultSet
             rs = (ResultSet) callableStatement.getObject(2);
@@ -97,8 +93,6 @@ public class TestResultSet {
                 }
                 //json.put(obj);
                 json.add(obj.clone());
-                
-                toReturn = json.toJSONString();
 
                 System.out.println("ID: " + rs.getInt("TICKETID"));
                 System.out.println("DateTime: " + rs.getDate("DATETIME"));
@@ -134,10 +128,11 @@ public class TestResultSet {
                 dbConnection.close();
             }
         }
-        return toReturn;
     }
 
-    public void getDBConnection() {
+    private static Connection getDBConnection() {
+
+        Connection dbConnection = null;
 
         try {
             Class.forName(DB_DRIVER);
@@ -149,11 +144,11 @@ public class TestResultSet {
         try {
             dbConnection = DriverManager.getConnection(
                     DB_CONNECTION, DB_USER, DB_PASSWORD);
-            //return dbConnection;
+            return dbConnection;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-       
+        return dbConnection;
     }
 
 //    public TestResultSet() {
